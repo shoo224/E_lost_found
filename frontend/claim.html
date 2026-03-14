@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Claim Item - E Lost &amp; Found</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#2b8cee",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101922",
+          },
+          fontFamily: {
+            display: ["Lexend"],
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Lexend', sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+  <div class="layout-container flex flex-col min-h-screen">
+    <!-- Top Navigation Bar -->
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 lg:px-10 py-3 sticky top-0 z-50">
+      <div class="flex items-center gap-8">
+        <div class="flex items-center gap-4 text-primary">
+          <div class="size-8 bg-primary/10 rounded-lg flex items-center justify-center">
+            <span class="material-symbols-outlined">search_check</span>
+          </div>
+          <h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">
+            Campus Found
+          </h2>
+        </div>
+        <nav class="hidden md:flex items-center gap-9">
+          <a href="index.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors">Home</a>
+          <a href="lost.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors">Report Lost</a>
+          <a href="found.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors">Report Found</a>
+          <a href="admin.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors">Admin</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-4 lg:gap-8"></div>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center py-8 px-4 lg:px-10">
+      <div class="w-full max-w-[800px] space-y-6">
+        <div class="space-y-2 text-center">
+          <h1 class="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+            Claim Found Item
+          </h1>
+          <p class="text-slate-600 dark:text-slate-400 text-sm max-w-[42rem] mx-auto">
+            You must be logged in to claim. If you received an email about a match, log in with your college email (OTP) first,
+            then submit the claim.
+          </p>
+        </div>
+
+        <!-- Global message -->
+        <div id="msg" class="alert hide"></div>
+
+        <div class="bg-white dark:bg-slate-900 p-6 lg:p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6">
+          <!-- Login block -->
+          <div id="login-block" class="space-y-4 hide">
+            <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
+              <span class="material-symbols-outlined text-primary">verified_user</span>
+              <h2 class="text-lg font-bold">Log in to claim (college email + OTP)</h2>
+            </div>
+            <div class="space-y-4">
+              <div class="space-y-1.5">
+                <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">College email</label>
+                <div class="otp-row flex gap-2 items-end">
+                  <input
+                    id="claim-email"
+                    type="email"
+                    placeholder="you@college.edu"
+                    class="flex-1 rounded-lg border-slate-200 dark:border-slate-800 bg-background-light dark:bg-slate-800 focus:border-primary focus:ring-primary transition-all px-3 py-2 text-sm"
+                  />
+                  <button
+                    type="button"
+                    id="claim-send-otp"
+                    class="px-4 py-2 bg-primary/10 text-primary font-bold text-xs rounded-lg hover:bg-primary/20 transition-colors whitespace-nowrap"
+                  >
+                    Send OTP
+                  </button>
+                </div>
+              </div>
+              <div class="space-y-1.5">
+                <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">OTP</label>
+                <div class="otp-row flex gap-2 items-end">
+                  <input
+                    id="claim-otp"
+                    type="text"
+                    maxlength="6"
+                    placeholder="6-digit code"
+                    class="flex-1 rounded-lg border-slate-200 dark:border-slate-800 bg-background-light dark:bg-slate-800 focus:border-primary focus:ring-primary transition-all px-3 py-2 text-sm"
+                  />
+                  <button
+                    type="button"
+                    id="claim-verify-otp"
+                    class="px-4 py-2 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap"
+                  >
+                    Log in
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Claim form -->
+          <div id="claim-form" class="hide space-y-3">
+            <div class="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
+              <span class="material-symbols-outlined text-primary">assignment</span>
+              <p>
+                Found item ID:
+                <strong id="found-id" class="font-semibold"></strong>,
+                Lost item ID:
+                <strong id="lost-id" class="font-semibold"></strong>
+              </p>
+            </div>
+            <button
+              type="button"
+              id="btn-submit-claim"
+              class="w-full bg-primary text-white font-bold py-2.5 rounded-xl hover:bg-primary/90 transition-all shadow-md shadow-primary/20 text-sm"
+            >
+              Submit Claim
+            </button>
+          </div>
+
+          <!-- Login prompt -->
+          <div id="login-prompt" class="hide text-xs text-slate-600 dark:text-slate-400">
+            Log in above with your college email (OTP), then click <span class="font-semibold">Submit Claim</span>.
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="mt-auto py-8 px-6 lg:px-10 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+      <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex items-center gap-2 text-slate-400">
+          <span class="material-symbols-outlined">search_check</span>
+          <span class="text-sm">© 2024 E Lost &amp; Found</span>
+        </div>
+        <div class="flex gap-8">
+          <a href="#" class="text-slate-500 hover:text-primary text-sm">Privacy Policy</a>
+          <a href="#" class="text-slate-500 hover:text-primary text-sm">Terms of Service</a>
+          <a href="#" class="text-slate-500 hover:text-primary text-sm">Help Center</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/auth.js"></script>
+  <script>
+    (function() {
+      var params = new URLSearchParams(window.location.search);
+      var foundId = params.get('found_id');
+      var lostId = params.get('lost_id');
+      if (!foundId || !lostId) {
+        document.getElementById('msg').textContent = 'Missing found_id or lost_id in URL.';
+        document.getElementById('msg').className = 'alert alert-error';
+        document.getElementById('msg').classList.remove('hide');
+        return;
+      }
+      document.getElementById('found-id').textContent = foundId;
+      document.getElementById('lost-id').textContent = lostId;
+
+      var baseUrl = window.API_BASE_URL || 'http://localhost:8000';
+
+      function showMsg(text, type) {
+        var el = document.getElementById('msg');
+        el.textContent = text;
+        el.className = 'alert alert-' + (type || 'info');
+        el.classList.remove('hide');
+      }
+
+      function showClaimForm() {
+        document.getElementById('login-block').classList.add('hide');
+        document.getElementById('claim-form').classList.remove('hide');
+        document.getElementById('login-prompt').classList.add('hide');
+      }
+
+      document.getElementById('claim-send-otp').onclick = function() {
+        var email = document.getElementById('claim-email').value.trim();
+        if (!email) { showMsg('Enter college email.', 'error'); return; }
+        fetch(baseUrl + '/auth/otp/send', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email }) })
+          .then(function(r) { return r.json().then(function(j) { if (!r.ok) throw new Error(j.detail || r.statusText); return j; }); })
+          .then(function() { showMsg('OTP sent to your email.', 'success'); })
+          .catch(function(e) { showMsg(e.message || 'Failed to send OTP.', 'error'); });
+      };
+
+      document.getElementById('claim-verify-otp').onclick = function() {
+        var email = document.getElementById('claim-email').value.trim();
+        var otp = document.getElementById('claim-otp').value.trim();
+        if (!email || !otp) { showMsg('Enter email and OTP.', 'error'); return; }
+        fetch(baseUrl + '/auth/otp/verify', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: email, otp: otp }) })
+          .then(function(r) { return r.json().then(function(j) { if (!r.ok) throw new Error(j.detail || r.statusText); return j; }); })
+          .then(function(data) {
+            api.setToken(data.access_token);
+            showMsg('Logged in. You can submit the claim now.', 'success');
+            showClaimForm();
+          })
+          .catch(function(e) { showMsg(e.message || 'Invalid OTP.', 'error'); });
+      };
+
+      document.getElementById('btn-submit-claim').onclick = function() {
+        var token = api.getToken();
+        if (!token) {
+          document.getElementById('login-block').classList.remove('hide');
+          document.getElementById('claim-form').classList.add('hide');
+          document.getElementById('login-prompt').classList.remove('hide');
+          showMsg('Please log in first (college email + OTP above).', 'error');
+          return;
+        }
+        api.post('/claims', { found_item_id: foundId, lost_item_id: lostId }).then(function(data) {
+          showMsg('Claim submitted. Admin will review it.', 'success');
+          document.getElementById('claim-form').classList.add('hide');
+        }).catch(function(err) {
+          showMsg(err.message || 'Failed to submit claim.', 'error');
+        });
+      };
+
+      if (api.getToken()) {
+        showClaimForm();
+      } else {
+        document.getElementById('login-block').classList.remove('hide');
+        document.getElementById('claim-form').classList.remove('hide');
+        document.getElementById('login-prompt').classList.remove('hide');
+      }
+    })();
+  </script>
+</body>
+</html>

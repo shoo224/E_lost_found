@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>E Lost &amp; Found</title>
+
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="css/style.css" />
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#2b8cee",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101922",
+          },
+          fontFamily: {
+            display: ["Lexend"],
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Lexend', sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+  <div class="layout-container flex flex-col min-h-screen">
+    <!-- Top Navigation Bar -->
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 lg:px-10 py-3 sticky top-0 z-50">
+      <div class="flex items-center gap-8">
+        <div class="flex items-center gap-4 text-primary">
+          <div class="size-8 bg-primary/10 rounded-lg flex items-center justify-center">
+            <span class="material-symbols-outlined">search_check</span>
+          </div>
+          <h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">
+            Campus Found
+          </h2>
+        </div>
+        <nav class="hidden md:flex items-center gap-9">
+          <a href="index.html" class="text-primary text-sm font-bold border-b-2 border-primary pb-1">Home</a>
+          <a href="lost.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors">Report Lost</a>
+          <a href="found.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors">Report Found</a>
+          <a href="admin.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors">Admin</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-4 lg:gap-8">
+        <!-- Could add a theme toggle or quick search here -->
+      </div>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center py-10 px-4 lg:px-10">
+      <div class="w-full max-w-[1200px] space-y-10">
+        <!-- Hero -->
+        <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+          <div class="space-y-4">
+            <h1 class="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+              Report, Match &amp; Reunite
+            </h1>
+            <p class="text-slate-600 dark:text-slate-400">
+              E Lost &amp; Found helps students and administration connect lost items with their rightful owners using smart matching
+              and instant notifications.
+            </p>
+            <div class="flex flex-wrap gap-3">
+              <a
+                href="lost.html"
+                class="inline-flex items-center justify-center px-4 py-2.5 rounded-full bg-primary text-white text-sm font-semibold shadow-md shadow-primary/20 hover:bg-primary/90 transition-colors"
+              >
+                Report Lost Item
+              </a>
+              <a
+                href="found.html"
+                class="inline-flex items-center justify-center px-4 py-2.5 rounded-full bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-semibold text-slate-700 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+              >
+                I Found Something
+              </a>
+            </div>
+          </div>
+          <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-md p-6 lg:p-8">
+            <h2 class="text-sm font-semibold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-[0.12em]">
+              Live Campus Stats
+            </h2>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="rounded-xl bg-primary/5 px-4 py-3 flex flex-col gap-1">
+                <span class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Items Lost</span>
+                <span id="stat-lost" class="text-2xl font-black text-slate-900 dark:text-white">–</span>
+                <span class="text-xs text-slate-500">Reported by students</span>
+              </div>
+              <div class="rounded-xl bg-emerald-500/5 px-4 py-3 flex flex-col gap-1">
+                <span class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Items Found</span>
+                <span id="stat-found" class="text-2xl font-black text-slate-900 dark:text-white">–</span>
+                <span class="text-xs text-slate-500">Submitted by students &amp; admin</span>
+              </div>
+              <div class="rounded-xl bg-slate-900/5 px-4 py-3 flex flex-col gap-1">
+                <span class="text-[11px] uppercase tracking-[0.18em] text-slate-500">Total Lost</span>
+                <span id="stat-total" class="text-2xl font-black text-slate-900 dark:text-white">–</span>
+                <span class="text-xs text-slate-500">Overall lost reports</span>
+              </div>
+            </div>
+            <p class="mt-4 text-xs text-slate-500">
+              Stats update in real-time as students submit new lost and found reports.
+            </p>
+          </div>
+        </section>
+
+        <!-- Quick actions -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <a
+            href="lost.html"
+            class="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-primary/60 transition-all"
+          >
+            <span class="material-symbols-outlined text-primary mt-1">sentiment_dissatisfied</span>
+            <div class="space-y-1">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">I lost something</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400">Create a detailed report so others can identify your item.</p>
+            </div>
+          </a>
+          <a
+            href="found.html"
+            class="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-primary/60 transition-all"
+          >
+            <span class="material-symbols-outlined text-emerald-500 mt-1">volunteer_activism</span>
+            <div class="space-y-1">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">I found something</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400">Help reunite items with their owners in just a few steps.</p>
+            </div>
+          </a>
+          <a
+            href="admin.html"
+            class="flex items-start gap-3 p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md hover:border-primary/60 transition-all"
+          >
+            <span class="material-symbols-outlined text-slate-600 mt-1">admin_panel_settings</span>
+            <div class="space-y-1">
+              <h3 class="text-sm font-bold text-slate-900 dark:text-white">Administration</h3>
+              <p class="text-xs text-slate-600 dark:text-slate-400">Login to approve claims and manage campus lost &amp; found.</p>
+            </div>
+          </a>
+        </section>
+      </div>
+    </main>
+
+    <footer class="mt-auto py-8 px-6 lg:px-10 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+      <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex items-center gap-2 text-slate-400">
+          <span class="material-symbols-outlined">search_check</span>
+          <span class="text-sm">© 2024 E Lost &amp; Found</span>
+        </div>
+        <div class="flex gap-8">
+          <a href="#" class="text-slate-500 hover:text-primary text-sm">Privacy Policy</a>
+          <a href="#" class="text-slate-500 hover:text-primary text-sm">Terms of Service</a>
+          <a href="#" class="text-slate-500 hover:text-primary text-sm">Help Center</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="js/api.js"></script>
+  <script src="js/main.js"></script>
+  <script>
+    // Load homepage stats on load
+    (function() {
+      api.getStats().then(function(data) {
+        document.getElementById('stat-lost').textContent = data.total_lost;
+        document.getElementById('stat-found').textContent = data.total_found;
+        document.getElementById('stat-total').textContent = data.total_items_lost;
+      }).catch(function() {
+        document.getElementById('stat-lost').textContent = '0';
+        document.getElementById('stat-found').textContent = '0';
+        document.getElementById('stat-total').textContent = '0';
+      });
+    })();
+  </script>
+</body>
+</html>

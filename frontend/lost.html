@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Report Lost Item - E Lost &amp; Found</title>
+
+  <!-- Tailwind UI layout (from Stitch) -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+  <!-- Keep your own CSS (for .hide, .alert, etc. used by JS) -->
+  <link rel="stylesheet" href="css/style.css" />
+
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            primary: "#2b8cee",
+            "background-light": "#f6f7f8",
+            "background-dark": "#101922",
+          },
+          fontFamily: {
+            display: ["Lexend"],
+          },
+          borderRadius: {
+            DEFAULT: "0.25rem",
+            lg: "0.5rem",
+            xl: "0.75rem",
+            full: "9999px",
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    body {
+      font-family: 'Lexend', sans-serif;
+    }
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+  </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+  <div class="layout-container flex flex-col min-h-screen">
+    <!-- Top Navigation Bar -->
+    <header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 px-6 lg:px-10 py-3 sticky top-0 z-50">
+      <div class="flex items-center gap-8">
+        <div class="flex items-center gap-4 text-primary">
+          <div class="size-8 bg-primary/10 rounded-lg flex items-center justify-center">
+            <span class="material-symbols-outlined">search_check</span>
+          </div>
+          <h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">
+            Campus Found
+          </h2>
+        </div>
+        <nav class="hidden md:flex items-center gap-9">
+          <a href="index.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors">Home</a>
+          <a href="lost.html" class="text-primary text-sm font-bold border-b-2 border-primary pb-1">Report Lost</a>
+          <a href="found.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors">Report Found</a>
+          <a href="admin.html" class="text-slate-600 dark:text-slate-300 text-sm font-medium hover:text-primary transition-colors">Admin</a>
+        </nav>
+      </div>
+      <div class="flex items-center gap-4 lg:gap-8">
+        <!-- You can add search/profile here later if you like -->
+      </div>
+    </header>
+
+    <main class="flex-1 flex flex-col items-center py-8 px-4 lg:px-10">
+      <div class="w-full max-w-[1200px] grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Left Content: OTP + Form -->
+        <div class="lg:col-span-8 space-y-6">
+          <!-- Breadcrumbs -->
+          <div class="flex items-center gap-2 text-sm">
+            <a href="index.html" class="text-slate-500 hover:text-primary">Home</a>
+            <span class="text-slate-400">/</span>
+            <span class="text-slate-900 dark:text-white font-medium">Report Lost Item</span>
+          </div>
+
+          <div class="space-y-2">
+            <h1 class="text-3xl lg:text-4xl font-black text-slate-900 dark:text-white tracking-tight">
+              Report a Lost Item
+            </h1>
+            <p class="text-slate-600 dark:text-slate-400">
+              Step 1: Verify your college email with OTP. Step 2: Fill in the item details and submit your report.
+            </p>
+          </div>
+
+          <!-- Global message (used by js/lost.js) -->
+          <div id="msg" class="alert hide"></div>
+
+          <!-- OTP Section -->
+          <section class="bg-white dark:bg-slate-900 p-6 lg:p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-6">
+            <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
+              <span class="material-symbols-outlined text-primary">verified_user</span>
+              <h2 class="text-xl font-bold">Verify College Email</h2>
+            </div>
+            <p class="text-sm text-slate-600 dark:text-slate-400">
+              We use OTP verification on your college email to prevent spam and make sure we can contact you if a match is found.
+            </p>
+
+            <div class="space-y-4">
+              <div class="space-y-1.5">
+                <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">College email</label>
+                <div class="flex flex-col sm:flex-row gap-2">
+                  <!-- ID expected by lost.js -->
+                  <input
+                    id="college_email"
+                    type="email"
+                    required
+                    placeholder="you@college.edu"
+                    class="flex-1 rounded-lg border-slate-200 dark:border-slate-800 bg-background-light dark:bg-slate-800 focus:border-primary focus:ring-primary transition-all px-3 py-2 text-sm"
+                  />
+                  <!-- ID expected by lost.js -->
+                  <button
+                    type="button"
+                    id="btn-send-otp"
+                    class="px-4 py-2 bg-primary/10 text-primary font-bold text-xs rounded-lg hover:bg-primary/20 transition-colors whitespace-nowrap"
+                  >
+                    Send OTP
+                  </button>
+                </div>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Enter OTP</label>
+                <div class="flex flex-col sm:flex-row gap-2 items-center">
+                  <!-- ID expected by lost.js -->
+                  <input
+                    id="otp"
+                    type="text"
+                    maxlength="6"
+                    placeholder="6-digit code"
+                    class="flex-1 rounded-lg border-slate-200 dark:border-slate-800 bg-background-light dark:bg-slate-800 focus:border-primary focus:ring-primary transition-all px-3 py-2 text-sm"
+                  />
+                  <!-- ID expected by lost.js -->
+                  <button
+                    type="button"
+                    id="btn-verify-otp"
+                    class="px-4 py-2 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap"
+                  >
+                    Verify OTP
+                  </button>
+                </div>
+                <!-- Shown by lost.js when OTP succeeds -->
+                <p id="email-verified" class="alert alert-success hide mt-2">
+                  Email verified. You can submit the form below.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Lost Item Form (IDs match backend + lost.js) -->
+          <form
+            id="form-lost"
+            class="bg-white dark:bg-slate-900 p-6 lg:p-8 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 space-y-8"
+          >
+            <!-- Personal Info Section -->
+            <section class="space-y-4">
+              <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
+                <span class="material-symbols-outlined text-primary">person</span>
+                <h2 class="text-xl font-bold">Personal Information</h2>
+              </div>
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="space-y-1.5">
+                  <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Full Name</label>
+                  <!-- ID expected by backend/JS -->
+                  <input
+                    id="name"
+                    type="text"
+                    required
+                    placeholder="e.g. Alex Johnson"
+                    class="w-full rounded-lg border-slate-200 dark:border-slate-800 bg-background-light dark:bg-slate-800 focus:border-primary focus:ring-primary transition-all px-3 py-2 text-sm"
+                  />
+                </div>
+                <div class="space-y-1.5">
+                  <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">College Email (verified)</label>
+                  <!-- Filled and readonly after OTP by lost.js -->
+                  <input
+                    id="college_email_form"
+                    type="email"
+                    required
+                    readonly
+                    placeholder="you@college.edu"
+                    class="w-full rounded-lg border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-800/80 focus:border-primary focus:ring-primary transition-all px-3 py-2 text-sm"
+                  />
+                  <p class="text-[11px] text-slate-500 mt-1">
+                    This is copied from your verified email above.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <!-- Item Details Section -->
+            <section class="space-y-4">
+              <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
+                <span class="material-symbols-outlined text-primary">inventory_2</span>
+                <h2 class="text-xl font-bold">Item Details</h2>
+              </div>
+              <div class="space-y-4">
+                <div class="space-y-1.5">
+                  <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Item Name</label>
+                  <input
+                    id="item_name"
+                    type="text"
+                    required
+                    placeholder="e.g. Blue Hydroflask, Sony Headphones"
+                    class="w-full rounded-lg border-slate-200 dark:border-slate-800 bg-background-light dark:bg-slate-800 focus:border-primary focus:ring-primary transition-all px-3 py-2 text-sm"
+                  />
+                </div>
+                <div class="space-y-1.5">
+                  <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Detailed Description</label>
+                  <textarea
+                    id="description"
+                    required
+                    rows="4"
+                    placeholder="Describe unique features, scratches, stickers, or serial numbers..."
+                    class="w-full rounded-lg border-slate-200 dark:border-slate-800 bg-background-light dark:bg-slate-800 focus:border-primary focus:ring-primary transition-all px-3 py-2 text-sm"
+                  ></textarea>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">Where was it lost?</label>
+                    <div class="relative">
+                      <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-xl">location_on</span>
+                      <input
+                        id="where_lost"
+                        type="text"
+                        required
+                        placeholder="e.g. Science Lab, Cafeteria"
+                        class="w-full pl-10 rounded-lg border-slate-200 dark:border-slate-800 bg-background-light dark:bg-slate-800 focus:border-primary focus:ring-primary transition-all px-3 py-2 text-sm"
+                      />
+                    </div>
+                  </div>
+                  <div class="space-y-1.5">
+                    <label class="text-sm font-semibold text-slate-700 dark:text-slate-300">When was it lost?</label>
+                    <div class="relative">
+                      <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-xl">calendar_today</span>
+                      <!-- Backend expects a date; we keep type=date -->
+                      <input
+                        id="when_lost"
+                        type="date"
+                        required
+                        class="w-full pl-10 rounded-lg border-slate-200 dark:border-slate-800 bg-background-light dark:bg-slate-800 focus:border-primary focus:ring-primary transition-all px-3 py-2 text-sm"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- Media Section -->
+            <section class="space-y-4">
+              <div class="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
+                <span class="material-symbols-outlined text-primary">image</span>
+                <h2 class="text-xl font-bold">Reference Photo (Optional)</h2>
+              </div>
+              <div class="border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-xl p-6 flex flex-col items-center justify-center gap-3 bg-background-light/50 dark:bg-slate-800/50">
+                <span class="material-symbols-outlined text-4xl text-slate-400">cloud_upload</span>
+                <div class="text-center space-y-1">
+                  <p class="text-sm font-medium">Attach a clear photo if available</p>
+                  <p class="text-xs text-slate-500">PNG, JPG up to 10MB</p>
+                </div>
+                <!-- Real file input (ID expected by lost.js) -->
+                <input id="image" type="file" accept="image/*" class="mt-2 block text-xs text-slate-600 dark:text-slate-300" />
+              </div>
+            </section>
+
+            <!-- Submit -->
+            <div class="pt-4 flex flex-col sm:flex-row gap-4">
+              <!-- ID expected by lost.js -->
+              <button
+                id="btn-submit"
+                type="submit"
+                class="flex-1 bg-primary text-white font-bold py-3 rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+              >
+                Submit Report
+              </button>
+              <a
+                href="index.html"
+                class="px-8 py-3 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-bold rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors text-center"
+              >
+                Cancel
+              </a>
+            </div>
+          </form>
+        </div>
+
+        <!-- Right Content: Tips / Sidebar (purely visual) -->
+        <aside class="lg:col-span-4 space-y-6">
+          <div class="bg-white dark:bg-slate-900 p-6 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm sticky top-24">
+            <div class="mb-6">
+              <h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight">Tips for Finding Items</h3>
+              <p class="text-slate-500 dark:text-slate-400 text-sm">Increase your chances of recovery</p>
+            </div>
+            <div class="space-y-3">
+              <div class="flex items-start gap-4 p-3 rounded-lg bg-primary/5 border border-primary/10">
+                <span class="material-symbols-outlined text-primary mt-0.5">lightbulb</span>
+                <div class="flex flex-col">
+                  <p class="text-slate-900 dark:text-white text-sm font-bold">Reporting Tips</p>
+                  <p class="text-slate-500 text-xs mt-1">Be as specific as possible about distinctive markings or scratches.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+                <span class="material-symbols-outlined text-slate-400 group-hover:text-primary mt-0.5 transition-colors">map</span>
+                <div class="flex flex-col">
+                  <p class="text-slate-900 dark:text-white text-sm font-medium">Campus Map</p>
+                  <p class="text-slate-500 text-xs mt-1">Check the official campus lost and found zones on our map.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+                <span class="material-symbols-outlined text-slate-400 group-hover:text-primary mt-0.5 transition-colors">apartment</span>
+                <div class="flex flex-col">
+                  <p class="text-slate-900 dark:text-white text-sm font-medium">Common Areas</p>
+                  <p class="text-slate-500 text-xs mt-1">Visit the help desks in the Library and Student Union.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-4 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors group">
+                <span class="material-symbols-outlined text-slate-400 group-hover:text-primary mt-0.5 transition-colors">gpp_maybe</span>
+                <div class="flex flex-col">
+                  <p class="text-slate-900 dark:text-white text-sm font-medium">Safety Guidelines</p>
+                  <p class="text-slate-500 text-xs mt-1">Never meet someone alone to reclaim expensive property.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-auto py-8 px-6 lg:px-10 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+      <div class="max-w-[1200px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
+        <div class="flex items-center gap-2 text-slate-400">
+          <span class="material-symbols-outlined">search_check</span>
+          <span class="text-sm">© 2024 E Lost &amp; Found</span>
+        </div>
+        <div class="flex gap-8">
+          <a href="#" class="text-slate-500 hover:text-primary text-sm">Privacy Policy</a>
+          <a href="#" class="text-slate-500 hover:text-primary text-sm">Terms of Service</a>
+          <a href="#" class="text-slate-500 hover:text-primary text-sm">Help Center</a>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Your existing JS hooks (unchanged) -->
+  <script src="js/api.js"></script>
+  <script src="js/lost.js"></script>
+</body>
+</html>
