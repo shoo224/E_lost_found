@@ -45,35 +45,40 @@ def send_otp(req: OtpSendRequest):
     For simplicity: we accept email only for OTP send (admin and students with email).
     Enrollment-based: we could store enrollment -> email in users and send to that email.
     """
-    key = _get_user_key(req.email, req.enrollment_number)
-    # If key is enrollment, we might not have email yet - so for "student found" we verify enrollment
-    # by sending OTP to a placeholder or we require email in users. Here we require email for sending OTP.
-    if req.enrollment_number and not req.email:
-        # Look up email by enrollment in users
-        user = users_collection().find_one({"enrollment_number": req.enrollment_number.strip().lower()})
-        if user and user.get("email"):
-            email_to_send = user["email"]
+    try:
+        key = _get_user_key(req.email, req.enrollment_number)
+        # If key is enrollment, we might not have email yet - so for "student found" we verify enrollment
+        # by sending OTP to a placeholder or we require email in users. Here we require email for sending OTP.
+        if req.enrollment_number and not req.email:
+            # Look up email by enrollment in users
+            user = users_collection().find_one({"enrollment_number": req.enrollment_number.strip().lower()})
+            if user and user.get("email"):
+                email_to_send = user["email"]
+            else:
+                # New student: we don't have email. Require email in request for OTP.
+                raise HTTPException(
+                    status_code=400,
+                    detail="Provide email to receive OTP, or register with enrollment first",
+                )
         else:
-            # New student: we don't have email. Require email in request for OTP.
-            raise HTTPException(
-                status_code=400,
-                detail="Provide email to receive OTP, or register with enrollment first",
-            )
-    else:
-        email_to_send = key if req.email else None
-    if not email_to_send:
-        raise HTTPException(status_code=400, detail="Email required to send OTP")
+            email_to_send = key if req.email else None
+        if not email_to_send:
+            raise HTTPException(status_code=400, detail="Email required to send OTP")
 
-    otp = generate_otp(6)
-    store_otp(key, otp, purpose="login")
-    sent = send_otp_email(email_to_send, otp)
-    if sent:
-        return {"message": "OTP sent to your email"}
-    # Local/dev fallback: if email provider is not configured, return OTP in response.
-    return {
-        "message": "Email is not configured on server. Using dev OTP fallback.",
-        "dev_otp": otp,
-    }
+        otp = generate_otp(6)
+        store_otp(key, otp, purpose="login")
+        sent = send_otp_email(email_to_send, otp)
+        if sent:
+            return {"message": "OTP sent to your email"}
+        # Local/dev fallback: if email provider is not configured, return OTP in response.
+        return {
+            "message": "Email is not configured on server. Using dev OTP fallback.",
+            "dev_otp": otp,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to send OTP: {str(e)}")
 
 
 @router.post("/otp/verify", response_model=dict)

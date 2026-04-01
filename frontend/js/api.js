@@ -40,7 +40,16 @@ var api = (function() {
       headers: headers(),
       body: body ? JSON.stringify(body) : undefined,
     }).then(function(res) {
-      if (!res.ok) return res.json().then(function(j) { throw new Error(j.detail || res.statusText); });
+      if (!res.ok) {
+        return res.text().then(function(text) {
+          try {
+            const json = JSON.parse(text);
+            throw new Error(json.detail || res.statusText);
+          } catch {
+            throw new Error(text || res.statusText);
+          }
+        });
+      }
       return res.json();
     });
   }
