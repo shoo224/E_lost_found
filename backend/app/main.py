@@ -68,6 +68,14 @@ app.include_router(found.router)
 app.include_router(claims.router)
 app.include_router(admin.router)
 
+# Serve frontend static files (HTML, CSS, JS) from the frontend/ directory
+# Because both frontend and backend are on same domain, we disable CORS and serve frontend at root
+import os
+from pathlib import Path
+frontend_path = Path(__file__).parent.parent.parent / "frontend"
+if frontend_path.exists():
+    app.mount("/", StaticFiles(directory=str(frontend_path), html=True), name="frontend")
+
 
 @app.get("/")
 def root():
