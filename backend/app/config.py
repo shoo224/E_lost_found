@@ -34,6 +34,10 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: str = ""
     SMTP_FROM: str = ""
 
+    # SendGrid
+    SENDGRID_API_KEY: str = ""
+    SENDGRID_FROM: str = ""
+
     # CORS - list of allowed origins for frontend
     CORS_ORIGINS: str = "http://localhost:5500,http://127.0.0.1:5500"
     # Admin emails (comma-separated) - these users get admin role
