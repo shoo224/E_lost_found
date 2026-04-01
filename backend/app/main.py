@@ -3,6 +3,7 @@
 
 from contextlib import asynccontextmanager
 import logging
+import os
 
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
@@ -82,4 +83,11 @@ def health():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="0.0.0.0", port=8000, reload=True)
+    
+    # Get port from environment (Render sets PORT env var), default to 8000 for local dev
+    port = int(os.environ.get("PORT", 8000))
+    
+    # Use reload in development (when DEBUG is set), disabled for production (Render)
+    reload = os.environ.get("DEBUG", "false").lower() == "true"
+    
+    uvicorn.run("app.main:app", host="0.0.0.0", port=port, reload=reload)

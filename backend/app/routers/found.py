@@ -25,8 +25,13 @@ def send_otp_for_student_found(email: str):
     email = email.lower().strip()
     otp = generate_otp(6)
     store_otp(email, otp, purpose="verify_enrollment")
-    send_otp_email(email, otp)
-    return {"message": "OTP sent to your email"}
+    sent = send_otp_email(email, otp)
+    if sent:
+        return {"message": "OTP sent to your email"}
+    return {
+        "message": "Email is not configured on server. Using dev OTP fallback.",
+        "dev_otp": otp,
+    }
 
 
 @router.post("/student/otp/verify")

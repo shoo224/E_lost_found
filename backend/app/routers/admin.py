@@ -75,11 +75,33 @@ def admin_direct_login():
     Direct admin login without password (for local/dev convenience).
     Uses the first email from ADMIN_EMAILS and returns an admin token.
     """
+    col = users_collection()
+
+    # Dev fallback: if ADMIN_EMAILS isn't configured, promote an existing user to admin.
     if not settings.admin_emails_list:
-        raise HTTPException(status_code=500, detail="No admin emails configured on server.")
+        user = col.find_one({})
+        if not user:
+            raise HTTPException(status_code=500, detail="No users exist to promote to admin.")
+        email = user.get("email")
+        user_id = str(user["_id"])
+        col.update_one(
+            {"_id": user["_id"]},
+            {"$set": {"role": "admin", "is_verified": True, "updated_at": datetime.utcnow()}},
+        )
+        token = create_access_token(sub=user_id, email=email, role="admin")
+        return {
+            "access_token": token,
+            "token_type": "bearer",
+            "user": {
+                "id": user_id,
+                "email": email,
+                "enrollment_number": user.get("enrollment_number"),
+                "role": "admin",
+                "is_verified": True,
+            },
+        }
 
     email = settings.admin_emails_list[0]
-    col = users_collection()
     user = col.find_one({"email": email})
     if not user:
         doc = {

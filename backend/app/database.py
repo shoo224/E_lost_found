@@ -54,6 +54,18 @@ def found_items_collection() -> Collection:
 
 
 def claims_collection() -> Collection:
+    return _get_db()["claim_requests"]
+
+
+def claim_requests_collection() -> Collection:
+    return _get_db()["claim_requests"]
+
+
+def legacy_claims_collection() -> Collection:
+    """
+    Backward-compatible: older versions stored claim requests in `claims`.
+    We keep this helper so the admin panel can still show existing requests.
+    """
     return _get_db()["claims"]
 
 

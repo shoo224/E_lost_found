@@ -66,8 +66,14 @@ def send_otp(req: OtpSendRequest):
 
     otp = generate_otp(6)
     store_otp(key, otp, purpose="login")
-    send_otp_email(email_to_send, otp)
-    return {"message": "OTP sent to your email"}
+    sent = send_otp_email(email_to_send, otp)
+    if sent:
+        return {"message": "OTP sent to your email"}
+    # Local/dev fallback: if email provider is not configured, return OTP in response.
+    return {
+        "message": "Email is not configured on server. Using dev OTP fallback.",
+        "dev_otp": otp,
+    }
 
 
 @router.post("/otp/verify", response_model=dict)

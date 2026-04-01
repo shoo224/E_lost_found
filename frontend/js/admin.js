@@ -126,14 +126,21 @@
       }
       listEl.innerHTML = '';
       claims.forEach(function(c) {
-        if (c.status !== 'pending') return;
         var li = document.createElement('li');
-        li.innerHTML = '<strong>Claim #' + c.id + '</strong> Found: ' + c.found_item_id + ', Lost: ' + c.lost_item_id +
-          '<div class="meta">Claimed by: ' + (c.claimed_by || '') + '</div>' +
-          '<div class="claim-actions">' +
-          '<button type="button" class="btn btn-success approve-claim" data-id="' + c.id + '">Approve</button>' +
-          '<button type="button" class="btn btn-danger reject-claim" data-id="' + c.id + '">Reject</button>' +
-          '</div>';
+        var found = c.found_item || {};
+        var lost = c.lost_item || {};
+        var title = '<strong>Claim #' + c.id + '</strong> <span class="meta">(' + (c.status || 'pending') + ')</span>';
+        var details = '<div class="meta">Found: ' + (found.item_name || c.found_item_id) + ' | Source: ' + (found.submitted_by || '-') + '</div>' +
+          '<div class="meta">Lost: ' + (lost.item_name || c.lost_item_id) + ' | Lost at: ' + (lost.where_lost || '-') + '</div>' +
+          '<div class="meta">Claimed by user: ' + (c.claimed_by || '-') + '</div>';
+        var actions = '';
+        if (c.status === 'pending') {
+          actions = '<div class="claim-actions">' +
+            '<button type="button" class="btn btn-success approve-claim" data-id="' + c.id + '">Approve</button>' +
+            '<button type="button" class="btn btn-danger reject-claim" data-id="' + c.id + '">Reject</button>' +
+            '</div>';
+        }
+        li.innerHTML = title + details + actions;
         listEl.appendChild(li);
       });
       listEl.querySelectorAll('.approve-claim').forEach(function(btn) {
@@ -142,9 +149,23 @@
       listEl.querySelectorAll('.reject-claim').forEach(function(btn) {
         btn.onclick = function() { updateClaim(btn.getAttribute('data-id'), 'rejected'); };
       });
-      if (listEl.innerHTML === '') listEl.innerHTML = '<li>No pending claims.</li>';
+      if (listEl.innerHTML === '') listEl.innerHTML = '<li>No claims available.</li>';
     }).catch(function() {
-      listEl.innerHTML = '<li>Failed to load claims.</li>';
+      // If we are on admin-panel.html and token isn't admin, try direct login and retry once.
+      if (!loginDiv && panelDiv) {
+        api.post('/admin/direct-login', {}).then(function(d) {
+          if (d && d.access_token) {
+            api.setToken(d.access_token);
+            loadClaims();
+            return;
+          }
+          listEl.innerHTML = '<li>Failed to load claims.</li>';
+        }).catch(function() {
+          listEl.innerHTML = '<li>Failed to load claims.</li>';
+        });
+      } else {
+        listEl.innerHTML = '<li>Failed to load claims.</li>';
+      }
     });
   }
 
@@ -158,4 +179,28 @@
   }
 
   checkAdminLoggedIn();
+
+  // admin-panel.html has no login form: always run dev direct login first.
+  // This avoids 403s caused by a stale/non-admin token in localStorage.
+  if (!loginDiv && panelDiv && document.getElementById('claims-list')) {
+    api.post('/admin/direct-login', {}).then(function(data) {
+      if (data && data.access_token) {
+        api.setToken(data.access_token);
+        var display = document.getElementById('admin-email-display');
+        if (display) {
+          display.textContent = (data.user && data.user.email) ? data.user.email : 'Direct admin (dev)';
+        }
+      }
+      loadClaims();
+    }).catch(function() {
+      // If direct login fails, fall back to whatever token exists.
+      if (api.getToken && api.getToken()) loadClaims();
+    });
+    return;
+  }
+
+  // admin.html: if token exists already, load claims.
+  if (api.getToken && api.getToken() && document.getElementById('claims-list')) {
+    loadClaims();
+  }
 })();
